@@ -14,16 +14,15 @@ def evaluate_rouge(summaries, references, remove_temp=False, rouge_args=[]):
     '''
     temp_dir = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
     temp_dir = os.path.join("temp",temp_dir)
-    print(temp_dir)
+
     system_dir = os.path.join(temp_dir, 'system')
     model_dir = os.path.join(temp_dir, 'model')
     # directory for generated summaries
     os.makedirs(system_dir)
     # directory for reference summaries
     os.makedirs(model_dir)
-    print(temp_dir, system_dir, model_dir)
 
-    assert len(summaries) == len(references)
+
     for i, (summary, candidates) in enumerate(zip(summaries, references)):
         summary_fn = '%i.txt' % i
         for j, candidate in enumerate(candidates):
@@ -48,11 +47,7 @@ def evaluate_rouge(summaries, references, remove_temp=False, rouge_args=[]):
 
     r = rouge.output_to_dict(output)
     print(output)
-    #print(r)
 
-    # remove the created temporary files
-    #if remove_temp:
-    #    shutil.rmtree(temp_dir)
     return r
 
 def clean_text_by_sentences(text):

@@ -1,40 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-#
-# Licensed under the GNU LGPL v2.1 - http://www.gnu.org/licenses/lgpl.html
-
-"""This module contains methods for parsing and preprocessing strings. Let's consider the most noticeable:
-
-* :func:`~gensim.parsing.preprocessing.remove_stopwords` - remove all stopwords from string
-* :func:`~gensim.parsing.preprocessing.preprocess_string` -  preprocess string (in default NLP meaning)
-
-Examples:
----------
-.. sourcecode:: pycon
-
-    >>> from gensim.parsing.preprocessing import remove_stopwords
-    >>> remove_stopwords("Better late than never, but better never late.")
-    u'Better late never, better late.'
-    >>>
-    >>> preprocess_string("<i>Hel 9lo</i> <b>Wo9 rld</b>! Th3     weather_is really g00d today, isn't it?")
-    [u'hel', u'rld', u'weather', u'todai', u'isn']
-
-
-Data:
------
-
-.. data:: STOPWORDS - Set of stopwords from Stone, Denis, Kwantes (2010).
-.. data:: RE_PUNCT - Regexp for search an punctuation.
-.. data:: RE_TAGS - Regexp for search an tags.
-.. data:: RE_NUMERIC - Regexp for search an numbers.
-.. data:: RE_NONALPHA - Regexp for search an non-alphabetic character.
-.. data:: RE_AL_NUM - Regexp for search a position between letters and digits.
-.. data:: RE_NUM_AL - Regexp for search a position between digits and letters .
-.. data:: RE_WHITESPACE - Regexp for search space characters.
-.. data:: DEFAULT_FILTERS - List of function for string preprocessing.
-
-"""
-
 import re
 import string
 import glob
@@ -79,8 +42,8 @@ RE_PUNCT = re.compile(r'([%s])+' % re.escape(string.punctuation), re.UNICODE)
 RE_TAGS = re.compile(r"<([^>]+)>", re.UNICODE)
 RE_NUMERIC = re.compile(r"[0-9]+", re.UNICODE)
 RE_NONALPHA = re.compile(r"\W", re.UNICODE)
-RE_AL_NUM = re.compile(r"([a-z]+)([0-9]+)", flags=re.UNICODE)
-RE_NUM_AL = re.compile(r"([0-9]+)([a-z]+)", flags=re.UNICODE)
+#RE_AL_NUM = re.compile(r"([a-z]+)([0-9]+)", flags=re.UNICODE)
+#RE_NUM_AL = re.compile(r"([0-9]+)([a-z]+)", flags=re.UNICODE)
 RE_WHITESPACE = re.compile(r"(\s)+", re.UNICODE)
 
 
@@ -370,7 +333,9 @@ def preprocess_string(s, filters=DEFAULT_FILTERS):
         [u'hel', u'9lo', u'wo9', u'rld', u'th3', u'weather', u'is', u'really', u'g00d', u'today', u'isn', u't', u'it']
 
     """
+    print("s: ", s)
     s = utils.to_unicode(s)
+    print("s: ", s)
     for f in filters:
         s = f(s)
     return s.split()
@@ -398,6 +363,7 @@ def preprocess_documents(docs):
         [[u'hel', u'rld'], [u'weather', u'todai', u'isn']]
 
     """
+    print("in preprocess")
     return [preprocess_string(d) for d in docs]
 
 

@@ -2,16 +2,11 @@ from collections import Counter
 import numpy as np
 import math
 import torch
-import torch.nn as nn
 import random
-import time
-import io
-import codecs
-
-
 
 from utils import evaluate_rouge
 from bert_model import BertEdgeScorer, BertConfig
+
 
 class PacSumExtractor:
 
@@ -25,58 +20,49 @@ class PacSumExtractor:
     def extract_summary(self, data_iterator):
 
         summaries = []
-        references = []
+        #references = []
+
 
         for item in data_iterator:
-            article, abstract, inputs = item
+
+            article, inputs = item
             if len(article) <= self.extract_num:
                 summaries.append(article)
-                references.append([abstract])
                 continue
 
             edge_scores = self._calculate_similarity_matrix(*inputs)
             ids = self._select_tops(edge_scores, beta=self.beta, lambda1=self.lambda1, lambda2=self.lambda2)
             summary = list(map(lambda x: article[x], ids))
             summaries.append(summary)
-            references.append([abstract])
 
-        result = evaluate_rouge(summaries, references, remove_temp=True, rouge_args=[])
+
+        return summaries
 
     def tune_hparams(self, data_iterator, example_num=1000):
 
 
-        summaries, references = [], []
+        summaries, references, abstracts = [], [], []
         k = 0
         for item in data_iterator:
-            article, abstract, inputs = item
+            # article: 원문
+            # inputs: 단어 토크나이징 한거
+            article,  inputs = item
             edge_scores = self._calculate_similarity_matrix(*inputs)
+
             tops_list, hparam_list = self._tune_extractor(edge_scores)
 
             summary_list = [list(map(lambda x: article[x], ids)) for ids in tops_list]
-            summaries.append(summary_list)
-            references.append([abstract])
+
+            references.append(article) # 원문
+            summaries.append(summary_list[0]) # 요약문
+
             k += 1
-            print(k)
             if k % example_num == 0:
                 break
 
-        best_rouge = 0
-        best_hparam = None
-        for i in range(len(summaries[0])):
-            print("threshold :  "+str(hparam_list[i])+'\n')
-            #print("non-lead ratio : "+str(ratios[i])+'\n')
-            result = evaluate_rouge([summaries[k][i] for k in range(len(summaries))], references, remove_temp=True, rouge_args=[])
+        return summaries, references
+        
 
-            if result['rouge_1_f_score'] > best_rouge:
-                best_rouge = result['rouge_1_f_score']
-                best_hparam = hparam_list[i]
-
-        print("The best hyper-parameter :  beta %.4f , lambda1 %.4f, lambda2 %.4f " % (best_hparam[0], best_hparam[1], best_hparam[2]))
-        print("The best rouge_1_f_score :  %.4f " % best_rouge)
-
-        self.beta = best_hparam[0]
-        self.lambda1 = best_hparam[1]
-        self.lambda2 = best_hparam[2]
 
     def _calculate_similarity_matrix(self, *inputs):
 

@@ -1,5 +1,7 @@
 from extractor import PacSumExtractorWithBert, PacSumExtractorWithTfIdf
 from data_iterator import Dataset
+import json
+from collections import OrderedDict
 
 import argparse
 
@@ -32,13 +34,13 @@ if __name__ == '__main__':
         #tune
         if args.mode == 'tune':
             tune_dataset = Dataset(args.tune_data_file)
-            tune_dataset_iterator = tune_dataset.iterate_once_doc_tfidf()
-            extractor.tune_hparams(tune_dataset_iterator)
+            tune_dataset_iterator = tune_dataset.iterate_once_doc_tfidf() # tune_dataset_iterator = value
+            references, summaries = extractor.tune_hparams(tune_dataset_iterator)
 
         #test
-        test_dataset = Dataset(args.test_data_file)
-        test_dataset_iterator = test_dataset.iterate_once_doc_tfidf()
-        extractor.extract_summary(test_dataset_iterator)
+        #test_dataset = Dataset(args.test_data_file)
+        #test_dataset_iterator = test_dataset.iterate_once_doc_tfidf()
+        #summaries = extractor.extract_summary(test_dataset_iterator)
 
 
 
@@ -58,3 +60,23 @@ if __name__ == '__main__':
         test_dataset = Dataset(args.test_data_file, vocab_file = args.bert_vocab_file)
         test_dataset_iterator = test_dataset.iterate_once_doc_bert()
         extractor.extract_summary(test_dataset_iterator)
+
+    results = list()
+
+    print(len(references))
+    print(len(summaries))
+
+    assert len(references) == len(summaries)
+
+    for i in range(len(references)):
+        jsondata = OrderedDict()
+        jsondata['summary'] = summaries[i]
+        jsondata['reference'] = references[i]
+        results.append(jsondata)
+
+    jsondata = OrderedDict()
+    jsondata['document'] = results
+
+    with open('summaries.json', 'w', encoding='utf-8') as f:
+        json.dump(jsondata, f, ensure_ascii=False, indent="\t")
+

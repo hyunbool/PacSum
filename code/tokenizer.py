@@ -62,8 +62,7 @@ def load_vocab(vocab_file):
             token = token.strip()
             vocab[token] = index
             index += 1
-    #print(index)
-    #print(str(vocab))
+
     return vocab
 
 
@@ -89,8 +88,6 @@ class FullTokenizer(object):
 
     def __init__(self, vocab_file, do_lower_case=True):
         self.vocab = load_vocab(vocab_file)
-        #print(self.vocab)
-        #print(len(self.vocab))
         self.basic_tokenizer = BasicTokenizer(do_lower_case=do_lower_case)
         self.wordpiece_tokenizer = WordpieceTokenizer(vocab=self.vocab)
 

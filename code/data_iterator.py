@@ -1,9 +1,5 @@
-import codecs
 import glob
 import json
-import random
-import math
-
 import numpy as np
 import torch
 import h5py
@@ -29,6 +25,7 @@ class Dataset(object):
         for value in self._doc_stream_tfidf(file_stream()):
             yield value
 
+
     def _doc_stream_tfidf(self, file_stream):
         for file_name in file_stream:
             for doc in self._parse_file2doc_tfidf(file_name):
@@ -39,18 +36,19 @@ class Dataset(object):
         with h5py.File(file_name,'r') as f:
             for j_str in f['dataset']:
                 obj = json.loads(j_str)
-                article, abstract = obj['article'], obj['abstract']
-                #article, abstract = obj['article'], obj['abstracts']
+                article, abstract, oracle = obj['article']
+
                 clean_article = clean_text_by_sentences(article)
                 segmented_artile = [sentence.split() for sentence in clean_article]
-                #print(tokenized_article[0])
 
-                yield article, abstract, [segmented_artile]
+
+                yield article, [segmented_artile]
 
 
     def iterate_once_doc_bert(self):
         def file_stream():
             for file_name in glob.glob(self._file_pattern):
+
                 yield file_name
         for value in self._doc_iterate_bert(self._doc_stream_bert(file_stream())):
             yield value
@@ -66,7 +64,6 @@ class Dataset(object):
             for j_str in f['dataset']:
                 obj = json.loads(j_str)
                 article, abstract = obj['article'], obj['abstract']
-                #article, abstract = obj['article'], obj['abstracts']
                 tokenized_article = [self._tokenizer.tokenize(sen) for sen in article]
                 #print(tokenized_article[0])
 

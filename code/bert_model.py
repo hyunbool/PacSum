@@ -10,7 +10,6 @@ import math
 import six
 import torch
 import torch.nn as nn
-from torch.nn import CrossEntropyLoss
 
 def gelu(x):
     """Implementation of the gelu activation function.
