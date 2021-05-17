@@ -2,7 +2,7 @@ import codecs
 import collections
 import unicodedata
 import six
-
+from konlpy.tag import Hannanum
 
 def convert_to_unicode(text):
     """Converts `text` to Unicode (if it's not already), assuming utf-8 input."""
@@ -165,6 +165,7 @@ class BasicTokenizer(object):
     def _tokenize_chinese_chars(self, text):
         """Adds whitespace around any CJK character."""
         output = []
+        print("text: ", text)
         for char in text:
             cp = ord(char)
             if self._is_chinese_char(cp):

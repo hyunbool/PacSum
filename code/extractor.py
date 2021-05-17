@@ -41,18 +41,19 @@ class PacSumExtractor:
     def tune_hparams(self, data_iterator, example_num=1000):
 
 
-        summaries, references, abstracts = [], [], []
+        titles, summaries, references = [], [], []
         k = 0
         for item in data_iterator:
             # article: 원문
             # inputs: 단어 토크나이징 한거
-            article,  inputs = item
+            title, article, inputs = item
             edge_scores = self._calculate_similarity_matrix(*inputs)
 
             tops_list, hparam_list = self._tune_extractor(edge_scores)
 
             summary_list = [list(map(lambda x: article[x], ids)) for ids in tops_list]
 
+            titles.append(title)
             references.append(article) # 원문
             summaries.append(summary_list[0]) # 요약문
 
@@ -60,7 +61,7 @@ class PacSumExtractor:
             if k % example_num == 0:
                 break
 
-        return summaries, references
+        return titles, references, summaries
         
 
 

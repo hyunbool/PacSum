@@ -5,16 +5,17 @@ import torch
 import h5py
 
 from tokenizer import FullTokenizer
-from utils import clean_text_by_sentences
 
 
 class Dataset(object):
 
     def __init__(self, file_pattern = None, vocab_file = None):
 
-        self._file_pattern = file_pattern
+        self._file_pattern = file_pattern # 파일 이름
         self._max_len = 60
         print("input max len : "+str(self._max_len))
+
+        # bert를 사용하는 것이면
         if vocab_file is not None:
             self._tokenizer = FullTokenizer(vocab_file, True)
 
@@ -35,14 +36,15 @@ class Dataset(object):
         print("Processing file: %s" % file_name)
         with h5py.File(file_name,'r') as f:
             for j_str in f['dataset']:
+
+                j_str = j_str.replace("\'", "\"")
                 obj = json.loads(j_str)
-                article, abstract, oracle = obj['article']
+                article = obj['article']
+                title = obj['title']
+                segmented_artile = [sentence.split() for sentence in article]
 
-                clean_article = clean_text_by_sentences(article)
-                segmented_artile = [sentence.split() for sentence in clean_article]
 
-
-                yield article, [segmented_artile]
+                yield title, article, [segmented_artile]
 
 
     def iterate_once_doc_bert(self):

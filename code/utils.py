@@ -50,25 +50,6 @@ def evaluate_rouge(summaries, references, remove_temp=False, rouge_args=[]):
 
     return r
 
-def clean_text_by_sentences(text):
-    """Tokenize a given text into sentences, applying filters and lemmatize them.
-
-    Parameters
-    ----------
-    text : str
-        Given text.
-
-    Returns
-    -------
-    list of :class:`~gensim.summarization.syntactic_unit.SyntacticUnit`
-        Sentences of the given text.
-
-    """
-    original_sentences = text
-    filtered_sentences = [join_words(sentence) for sentence in preprocess_documents(original_sentences)]
-
-    return filtered_sentences
-
 
 def join_words(words, separator=" "):
     """Concatenates `words` with `separator` between elements.

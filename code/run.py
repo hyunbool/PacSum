@@ -33,9 +33,11 @@ if __name__ == '__main__':
                                              lambda2=args.lambda2)
         #tune
         if args.mode == 'tune':
+            # 데이터 가져오기
             tune_dataset = Dataset(args.tune_data_file)
+
             tune_dataset_iterator = tune_dataset.iterate_once_doc_tfidf() # tune_dataset_iterator = value
-            references, summaries = extractor.tune_hparams(tune_dataset_iterator)
+            titles, references, summaries = extractor.tune_hparams(tune_dataset_iterator)
 
         #test
         #test_dataset = Dataset(args.test_data_file)
@@ -63,13 +65,11 @@ if __name__ == '__main__':
 
     results = list()
 
-    print(len(references))
-    print(len(summaries))
-
-    assert len(references) == len(summaries)
+    assert len(titles) == len(references) == len(summaries)
 
     for i in range(len(references)):
         jsondata = OrderedDict()
+        jsondata['title'] = titles[i]
         jsondata['summary'] = summaries[i]
         jsondata['reference'] = references[i]
         results.append(jsondata)
